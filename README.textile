@@ -1,0 +1,12 @@
+h1. Last.fm API
+
+I looked around at a couple of other Last.fm API projects first, but either I thought that developing with it would suck, or the documentation for getting started would suck. I thought about forking one of them and making changes to it, but I realized I'd end up making enough changes that it would be worthless to start with a fork.
+
+Instead, I've decided to write my own. Eventually it will be EPIC (I'm the founder of both "SimplePie":http://simplepie.org and "CloudFusion":http://getcloudfusion.com), but for now I'm just going to write it piece-by-piece as I need stuff.
+
+If you're looking for an API that's further along than this one, you can try:
+
+* "http://www.matto1990.com/projects/phplastfmapi/":http://www.matto1990.com/projects/phplastfmapi/
+* "http://lastfm.felixbruns.de/php-last.fm-api/":http://lastfm.felixbruns.de/php-last.fm-api/
+
+Happy hacking!
