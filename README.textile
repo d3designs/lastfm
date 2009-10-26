@@ -41,3 +41,5 @@ $response->status = $http->get_response_code();
 # Dump the response to the screen to see how to iterate over the XML nodes
 print_r($response);
 </pre>
+
+http://gist.github.com/218408
