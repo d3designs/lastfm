@@ -14,4 +14,4 @@ h2. Example usage
 
 If you want to make a request to Last.fm's <code>album.getInfo</code> method for "Motion City Soundtrack's":http://www.last.fm/music/Motion+City+Soundtrack ""Even If It Kills Me":http://www.last.fm/music/Motion+City+Soundtrack/Even+If+It+Kills+Me" album, you'd do the following:
 
-http://gist.github.com/218408
+<script src="http://gist.github.com/218408.js"></script>
