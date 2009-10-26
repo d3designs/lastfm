@@ -1,12 +1,23 @@
 h1. Last.fm API
 
-I looked around at a couple of other Last.fm API projects first, but either I thought that developing with it would suck, or the documentation for getting started would suck. I thought about forking one of them and making changes to it, but I realized I'd end up making enough changes that it would be worthless to start with a fork.
+This API will construct the appropriate Last.fm API URL to query. You need to bring your own "fetching":http://requestcore.googlecode.com, and you'll probably want some "caching":http://cachecore.googlecode.com too for performance.
 
-Instead, I've decided to write my own. Eventually it will be EPIC (I'm the founder of both "SimplePie":http://simplepie.org and "CloudFusion":http://getcloudfusion.com), but for now I'm just going to write it piece-by-piece as I need stuff.
+Because of the way that Last.fm handles authenticated requests, no extra work needs to be done at the API-level to support these requests. You will, however, need to manage your authentication tokens in your app as this API doesn't (and shouldn't) do that.
 
-If you're looking for an API that's further along than this one, you can try:
+h2. Setup
 
-* "http://www.matto1990.com/projects/phplastfmapi/":http://www.matto1990.com/projects/phplastfmapi/
-* "http://lastfm.felixbruns.de/php-last.fm-api/":http://lastfm.felixbruns.de/php-last.fm-api/
+You can rename <code>config-sample.inc.php</code> to <code>config.inc.php</code> and add your key/secret there, or you can pass your key/secret key to the constructor.
 
-Happy hacking!
+I would recommend the former over the latter if you generally only use on key/secret set.
+
+h2. Example usage
+
+If you want to make a request to Last.fm's <code>album.getInfo</code> method for "Motion City Soundtrack's":http://www.last.fm/music/Motion+City+Soundtrack ""Even If It Kills Me":http://www.last.fm/music/Motion+City+Soundtrack/Even+If+It+Kills+Me" album, you'd do the following:
+
+<pre>
+$fm = new LastFM();
+$api_url = $fm->album->get_info(array(
+	'artist' => 'Motion City Soundtrack',
+	'album' => 'Even If It Kills Me'
+));
+</pre>
