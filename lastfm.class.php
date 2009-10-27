@@ -1,7 +1,7 @@
 <?php
 /**
  * File: api-lastfm
- * 	Handle the Last.fm API. Currently only supports READ-ONLY methods.
+ * 	Handle the Last.fm API.
  *
  * Version:
  * 	2009.10.25
