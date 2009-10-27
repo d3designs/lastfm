@@ -4,7 +4,7 @@
  * 	Handle the Last.fm API.
  *
  * Version:
- * 	2009.10.25
+ * 	2009.10.26
  *
  * Copyright:
  * 	2009 Ryan Parman
@@ -190,7 +190,7 @@ class LastFM
 	/**
 	 * Handle requests to properties
 	 */
-	function __get($var)
+	public function __get($var)
 	{
 		// Determine the name of this class
 		$class_name = get_class($this);
@@ -202,7 +202,7 @@ class LastFM
 	/**
 	 * Handle requests to methods
 	 */
-	function __call($name, $args)
+	public function __call($name, $args)
 	{
 		// Change the names of the methods to match what the API expects
 		$name = strtolower(str_replace('_', '', $name));
@@ -217,6 +217,38 @@ class LastFM
 		$api_call = sprintf('http://' . $this->hostname . '/' . $this->api_version . '/?api_key=' . $this->key . '&method=%s&%s', $method, $fields);
 
 		// Return the value
-		return $api_call;
+		return $this->request($api_call);
+	}
+
+
+	/*%******************************************************************************************%*/
+	// REQUEST/RESPONSE
+
+	/**
+	 * Method: request()
+	 * 	Requests the data, parses it, and returns it. Requires RequestCore and SimpleXML.
+	 *
+	 * Parameters:
+	 * 	url - _string_ (Required) The web service URL to request.
+	 *
+	 * Returns:
+	 * 	ResponseCore object
+	 */
+	public function request($url)
+	{
+		if (class_exists('RequestCore'))
+		{
+			$http = new RequestCore($url);
+			$http->send_request();
+
+			$response = new stdClass();
+			$response->header = $http->get_response_header();
+			$response->body = new SimpleXMLElement($http->get_response_body(), LIBXML_NOCDATA);
+			$response->status = $http->get_response_code();
+
+			return $response;
+		}
+
+		throw new Exception('This class requires RequestCore. http://requestcore.googlecode.com');
 	}
 }

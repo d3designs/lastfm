@@ -1,8 +1,16 @@
 h1. Last.fm API
 
-This API will construct the appropriate Last.fm API URL to query. You need to bring your own "fetching":http://requestcore.googlecode.com, and you'll probably want some "caching":http://cachecore.googlecode.com too for performance.
+This API will construct the appropriate Last.fm API URL to query, and use RequestCore and SimpleXML to retrieve and parse the data.
 
 Because of the way that Last.fm handles authenticated requests, no extra work needs to be done at the API-level to support these requests. You will, however, need to manage your authentication tokens in your app as this API doesn't (and shouldn't) do that.
+
+h2. Requirements
+
+* PHP 5.2
+* cURL
+* SimpleXML
+* "RequestCore":http://requestcore.googlecode.com
+* "CacheCore":http://cachecore.googlecode.com (Optional)
 
 h2. Setup
 
