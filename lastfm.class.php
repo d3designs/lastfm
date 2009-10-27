@@ -239,6 +239,7 @@ class LastFM
 		if (class_exists('RequestCore'))
 		{
 			$http = new RequestCore($url);
+			$http->set_useragent(LASTFM_USERAGENT);
 			$http->send_request();
 
 			$response = new stdClass();
