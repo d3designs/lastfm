@@ -25,6 +25,12 @@ if (file_exists(dirname(__FILE__) . DIRECTORY_SEPARATOR . 'config.inc.php'))
 
 
 /*%******************************************************************************************%*/
+// EXCEPTIONS
+
+class LastFM_Exception extends Exception {}
+
+
+/*%******************************************************************************************%*/
 // CONSTANTS
 
 /**
@@ -85,6 +91,12 @@ class LastFM
 	var $subclass;
 
 	/**
+	 * Property: test_mode
+	 * 	Whether we're in test mode or not.
+	 */
+	var $test_mode;
+
+	/**
 	 * Property: api_version
 	 * The supported API version. This is inherited by all service-specific classes.
 	 */
@@ -108,8 +120,8 @@ class LastFM
 	 * 	public
 	 *
 	 * Parameters:
-	 * 	key - _string_ (Optional) Your Amazon API Key. If blank, it will look for the <AWS_KEY> constant.
-	 * 	secret_key - _string_ (Optional) Your Amazon API Secret Key. If blank, it will look for the <AWS_SECRET_KEY> constant.
+	 * 	key - _string_ (Optional) Your Last.fm API Key. If blank, it will look for the <AWS_KEY> constant.
+	 * 	secret_key - _string_ (Optional) Your Last.fm API Secret Key. If blank, it will look for the <AWS_SECRET_KEY> constant.
 	 * 	subclass - _string_ (Optional) Don't use this. This is an internal parameter.
 	 *
 	 * Returns:
@@ -117,9 +129,6 @@ class LastFM
 	 */
 	public function __construct($key = null, $secret_key = null, $subclass = null)
 	{
-		// Instantiate the utilities class.
-		// $this->util = new $this->utilities_class();
-
 		// Set default values
 		$this->key = null;
 		$this->secret_key = null;
@@ -151,7 +160,7 @@ class LastFM
 
 
 	/*%******************************************************************************************%*/
-	// SET OVERRIDE VALUES
+	// SETTERS
 
 	/**
 	 * Method: set_hostname()
@@ -182,6 +191,24 @@ class LastFM
 	{
 		$this->api_version = $api_version;
 	}
+	/**
+	 * Method: test_mode()
+	 * 	Enables test mode within the API. Enabling test mode will return the request URL instead of requesting it.
+	 *
+	 * Access:
+	 * 	public
+	 *
+	 * Parameters:
+	 * 	enabled - _boolean_ (Optional) Whether test mode is enabled or not.
+	 *
+	 * Returns:
+	 * 	void
+	 */
+	public function test_mode($enabled = true)
+	{
+		// Set default values
+		$this->test_mode = $enabled;
+	}
 
 
 	/*%******************************************************************************************%*/
@@ -196,7 +223,10 @@ class LastFM
 		$class_name = get_class($this);
 
 		// Re-instantiate this class, passing in the subclass value
-		return new $class_name($this->key, $this->secret_key, strtolower($var));
+		$ref = new $class_name($this->key, $this->secret_key, strtolower($var));
+		$ref->test_mode($this->test_mode); // Make sure this gets passed through.
+
+		return $ref;
 	}
 
 	/**
@@ -236,20 +266,40 @@ class LastFM
 	 */
 	public function request($url)
 	{
-		if (class_exists('RequestCore'))
+		if (!$this->test_mode)
 		{
-			$http = new RequestCore($url);
-			$http->set_useragent(LASTFM_USERAGENT);
-			$http->send_request();
+			if (class_exists('RequestCore'))
+			{
+				$http = new RequestCore($url);
+				$http->set_useragent(LASTFM_USERAGENT);
+				$http->send_request();
 
-			$response = new stdClass();
-			$response->header = $http->get_response_header();
-			$response->body = new SimpleXMLElement($http->get_response_body(), LIBXML_NOCDATA);
-			$response->status = $http->get_response_code();
+				$response = new stdClass();
+				$response->header = $http->get_response_header();
+				$response->body = $this->parse_response($http->get_response_body());
+				$response->status = $http->get_response_code();
 
-			return $response;
+				return $response;
+			}
+
+			throw new Exception('This class requires RequestCore. http://github.com/skyzyx/requestcore.');
 		}
 
-		throw new Exception('This class requires RequestCore. http://requestcore.googlecode.com');
+		return $url;
+	}
+
+	/**
+	 * Method: parse_response()
+	 * 	Default method for parsing the response data. You can extend the class and override this method for other response types.
+	 *
+	 * Parameters:
+	 * 	data - _string_ (Required) The data to parse.
+	 *
+	 * Returns:
+	 * 	mixed data
+	 */
+	public function parse_response($data)
+	{
+		return new SimpleXMLElement($data, LIBXML_NOCDATA);
 	}
 }
