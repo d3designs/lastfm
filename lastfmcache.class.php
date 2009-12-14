@@ -4,7 +4,7 @@
  * 	Handle the JSON formatted Last.fm API, and Cache the results to files.
  *
  * Version:
- * 	2009.12.11
+ * 	2009.12.13
  *
  * Copyright:
  * 	2009 Jay Williams
@@ -184,8 +184,8 @@ class LastFMCache extends LastFM
 		// If cache exists, and is still valid, load it
 		if($this->cache_mode && file_exists($cache) && (time() - filemtime($cache)) < $this->cache_ttl)
 		{
-			$response = (array) $this->parse_response(file_get_contents($cache));
-			$response['_cached'] = true; // Add notice that this is a cached file
+			$response = (object) json_decode(file_get_contents($cache));
+			$response->_cached = true; // Add notice that this is a cached file
 			
 			return $response;
 		}
@@ -197,15 +197,15 @@ class LastFMCache extends LastFM
 		$http->set_useragent(LASTFM_USERAGENT);
 		$http->send_request();
 		
-		$response = (array) $this->parse_response($http->get_response_body());
+		$response = (object) $this->parse_response($http->get_response_body());
 		
 		if ($this->header_mode)
-			$response['_header'] = $http->get_response_header();
+			$response->_header = $http->get_response_header();
 		
 		// Cache only successfuly requests
-		if ($this->cache_mode && $response['stat'] == 'ok')
+		if ($this->cache_mode && !isset($response->error))
 		{
-			file_put_contents($cache . '_tmp', serialize($response));
+			file_put_contents($cache . '_tmp', json_encode($response));
 			rename($cache . '_tmp', $cache);
 		}
 		
